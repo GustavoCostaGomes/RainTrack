@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrador{% endblock %}
+
+{% block content %}
+<div class="centeredContent">
+    <div class="adminCard">
+        <h1 class="title">Bem-vindo, {{ user_name }} (Admin)</h1>
+
+        <h2>Cadastrar novo usuário</h2>
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+            <p style="color: green;">{{ success }}</p>
+        {% endif %}
+
+        <form class="form" action="/admin" method="POST">
+            <div class="formInputs">
+                <div class="input">
+                    <label for="name">Nome</label>
+                    <input type="text" name="name" id="name" required />
+                </div>
+
+                <div class="input">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" required />
+                </div>
+
+                <div class="input">
+                    <label for="cpf">CPF</label>
+                    <input type="text" name="cpf" id="cpf" maxlength="11" required />
+                </div>
+
+                <div class="input">
+                    <label for="password">Senha</label>
+                    <input type="password" name="password" id="password" required />
+                </div>
+                <div class="input">
+                    <label for="role">Tipo de usuário</label>
+                    <select name="role" id="role">
+                        <option value="0">Usuário comum</option>
+                        <option value="1">Administrador</option>
+                    </select>
+                </div>
+                <div class="submit">
+                    <input type="submit" value="CADASTRAR" />
+                </div>
+            </div>
+        </form>
+        <div class="submit">
+            <div class="action-links">
+                <a href="{{ url_for('home') }}">
+                    <ion-icon name="home-outline"></ion-icon>
+                    Ir para Início
+                </a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

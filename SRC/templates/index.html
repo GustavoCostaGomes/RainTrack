@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - RainTrack{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="leftContent">
+    <div class="formCard">
+      <h1 class="title">LOGIN</h1>
+
+    
+      {% if error %}
+      <div class="error-message">{{ error }}</div>
+      {% endif %}
+
+      <form class="form" action="/" method="POST">
+        <div class="formInputs">
+          <div class="input">
+            <label for="entry">Email ou CPF</label>
+            <input type="text" name="entry" id="entry" required />
+          </div>
+          <div class="input">
+            <label for="password">Senha</label>
+            <input type="password" name="password" id="password" required />
+          </div>
+        </div>
+        <div class="submit">
+          <input type="submit" value="ENTRAR" />
+          <span>
+            <a href="{{ url_for('guest') }}">Entre como convidado</a>
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="rightContent">
+    <img src="{{ url_for('static', filename='img/imagemLogin.png') }}" alt="" />
+  </div>
+</div>
+{% endblock %}

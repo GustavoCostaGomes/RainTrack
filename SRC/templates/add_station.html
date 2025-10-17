@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Posto{% endblock %}
+
+{% block content %}
+<div class="centeredContent">
+    <div class="adminCard">
+        <h1 class="title">Cadastrar Novo Posto</h1>
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+            <p style="color: green;">{{ success }}</p>
+        {% endif %}
+
+        <form class="form" action="{{ url_for('add_station') }}" method="POST">
+            <div class="formInputs">
+                <div class="input">
+                    <label for="name">Nome do Posto</label>
+                    <input type="text" name="name" id="name" required />
+                </div>
+
+                <div class="input">
+                    <label for="latitude">Latitude</label>
+                    <input type="text" name="latitude" id="latitude" required />
+                </div>
+
+                <div class="input">
+                    <label for="longitude">Longitude</label>
+                    <input type="text" name="longitude" id="longitude" required />
+                </div>
+
+                <div class="input">
+                    <label for="uuid">UUID</label>
+                    <input type="text" name="uuid" id="uuid" maxlength="17" required />
+                </div>
+
+                <div class="input">
+                    <label for="cdParameter">Selecione os Parâmetros</label>
+                    <div class="checkbox-group">
+                        {% for param in parameters %}
+                            <label>
+                                <input type="checkbox" name="cdParameter" value="{{ param.id }}">
+                                {{ param.name }} ({{ param.unit }})
+                            </label>
+                            <br>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input">
+                    <label for="cdUser">Selecione o Usuário</label>
+                    <select name="cdUser" id="cdUser">
+                        <option value="">Escolha um usuário</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="submit">
+                    <input type="submit" value="CADASTRAR ESTAÇÃO" />
+                </div>
+            </div>
+        </form>
+        <div class="submit">
+            <div class="action-links">
+                <a href="{{ url_for('stations') }}">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Voltar para Postos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("uuid").addEventListener("input", function (e) {
+    let value = e.target.value.toUpperCase().replace(/[^A-F0-9]/g, ""); // mantém só HEX
+    let uuid = "";
+
+    for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 2 === 0) {
+            uuid += ":";
+        }
+        uuid += value[i];
+    }
+
+    e.target.value = uuid.substring(0, 17); // limita ao tamanho do uuid
+});
+</script>
+<script>
+function formatCoord(input) {
+    input.addEventListener("input", function(e) {
+        let value = e.target.value.replace(/[^0-9\.\-]/g, "");
+
+        if (value.includes("-")) {
+            value = "-" + value.replace(/-/g, "");
+        }
+
+        // Garante apenas um ponto decimal
+        const parts = value.split(".");
+        if (parts.length > 2) {
+            value = parts[0] + "." + parts[1];
+        }
+
+        e.target.value = value;
+    });
+}
+
+formatCoord(document.getElementById("latitude"));
+formatCoord(document.getElementById("longitude"));
+</script>
+{% endblock %}

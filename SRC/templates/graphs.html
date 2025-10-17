@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Gráficos{% endblock %}
+
+{% block content %}
+<div class="centeredContent">
+    <div class="adminCard full-width-card">
+        <h1 class="title">Gráficos dos Postos</h1>
+
+        <div class="filter-section">
+            <form method="GET" action="{{ url_for('graphs') }}" class="filter-form">
+                <div class="input-group">
+                    <label for="start_date">Data de Início:</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ start_date if start_date else '' }}">
+                </div>
+                <div class="input-group">
+                    <label for="end_date">Data de Fim:</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ end_date if end_date else '' }}">
+                </div>
+                <button type="submit" class="btn-primary">
+                    <ion-icon name="filter-outline"></ion-icon> Filtrar
+                </button>
+                <a href="{{ url_for('graphs') }}" class="btn-secondary">
+                    <ion-icon name="refresh-outline"></ion-icon> Limpar Filtros
+                </a>
+            </form>
+        </div>
+
+        {% if stations %}
+            {% for station in stations %}
+                <div class="graphCard">
+                    <div class="graph-header">
+                        <h2>{{ station.name }}</h2>
+                    </div>
+                    <div id="chart-{{ station.id }}" class="chart-container"></div>
+
+                    <script>
+                    (function() {
+                        const categories = JSON.parse('{{ station.categories | tojson | safe }}');
+                        let series = JSON.parse('{{ station.series | tojson | safe }}');
+
+                        // Converte os dados para float e trata nulls
+                        series = series.map(s => ({
+                            ...s,
+                            data: s.data.map(val => (val === null ? null : parseFloat(val)))
+                        }));
+
+                        // Cria eixos dinamicamente: primeiro parâmetro -> coluna (eixo esquerdo), demais -> linha (eixo direito)
+                        const yAxes = series.map((s, i) => ({
+                            title: { text: s.name },          // <--- aqui usamos o nome do parâmetro já com unidade
+                            labels: { format: '{value}', style: { color: '#666' } },
+                            opposite: i !== 0,                // primeiro eixo à esquerda, os outros à direita
+                            gridLineColor: '#e0e0e0'
+                        }));
+
+                        // Associa cada série ao seu eixo e tipo
+                        series = series.map((s, i) => ({
+                            ...s,
+                            type: i === 0 ? 'column' : 'line',
+                            yAxis: i
+                        }));
+
+                        Highcharts.chart('chart-{{ station.id }}', {
+                            chart: { 
+                                zoomType: 'xy',
+                                backgroundColor: 'transparent'
+                            },
+                            title: { 
+                                text: 'Gráfico de Medições - {{ station.name }}',
+                                align: 'left',
+                                style: { color: '#333', fontSize: '1.2em' }
+                            },
+                            xAxis: {
+                                categories: categories,
+                                crosshair: true,
+                                title: { text: 'Hora' },
+                                labels: {
+                                    style: { color: '#666' },
+                                    formatter: function() {
+                                        // Mostra apenas HH:MM no eixo
+                                        return this.value.split(' ')[1];
+                                    }
+                                }
+                            },
+                            yAxis: yAxes,
+                            tooltip: {
+                                shared: true,
+                                formatter: function() {
+                                    let s = `<b>${this.x}</b><br/>`;
+                                    this.points.forEach(p => {
+                                        s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${p.y}</b><br/>`;
+                                    });
+                                    return s;
+                                }
+                            },
+                            legend: {
+                                align: 'center',
+                                verticalAlign: 'bottom',
+                                layout: 'horizontal',
+                                itemStyle: { color: '#333' }
+                            },
+                            credits: { enabled: false },
+                            series: series
+                        });
+                    })();
+                    </script>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <ion-icon name="analytics-outline" class="empty-icon"></ion-icon>
+                <p class="empty-message">Nenhum gráfico disponível para o período selecionado.</p>
+                <p class="empty-submessage">Tente ajustar as datas ou adicionar medições.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+{% endblock %}

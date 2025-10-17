@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Parâmetros{% endblock %}
+
+{% block content %}
+<div class="centeredContent">
+    <div class="adminCard">
+        <h1 class="title">Parâmetros Cadastrados</h1>
+
+        {% if parameters %}
+            <div class="parameters-grid">
+                {% for param in parameters %}
+                    <div class="parameter-card" onclick="editParameter('{{ param.id }}')">
+                        <div class="parameter-header">
+                            <h3 class="parameter-name">{{ param.name }}</h3>
+                            <div class="parameter-actions">
+                                <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="parameter-details">
+                            <div class="parameter-info">
+                                <span class="info-label">Unidade:</span>
+                                <span class="info-value">{{ param.unit }}</span>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="info-label">Tipo:</span>
+                                <span class="info-value">{{ param.typeJson }}</span>
+                            </div>
+                            <div class="parameter-info">
+                                <span class="info-label">Casas Decimais:</span>
+                                <span class="info-value">{{ param.numberOfDecimalPlaces }}</span>
+                            </div>
+                        </div>
+                        <div class="parameter-hover-overlay">
+                            <span>Clique para editar</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <ion-icon name="analytics-outline" class="empty-icon"></ion-icon>
+                <p class="empty-message">Nenhum parâmetro cadastrado ainda.</p>
+                <p class="empty-submessage">Adicione seu primeiro parâmetro para começar.</p>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('add_parameter') }}" class="btn-primary">
+                <ion-icon name="add-outline"></ion-icon>
+                <span>ADICIONAR NOVO PARÂMETRO</span>
+            </a>
+            <a href="{{ url_for('home') }}" class="btn-secondary">
+                <ion-icon name="home-outline"></ion-icon>
+                <span>Voltar para o Início</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function editParameter(parameterId) {
+    // Função para redirecionar para a página de edição do parâmetro
+    window.location.href = `/edit_parameter/${parameterId}`;
+}
+</script>
+{% endblock %}
+
